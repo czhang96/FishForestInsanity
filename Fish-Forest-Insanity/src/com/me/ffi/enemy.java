@@ -11,12 +11,13 @@ public class enemy {
     Vector2 position;
     Player player;
     Rectangle bound;
-   
+    float speed;
     public enemy(Vector2 position, Player player) {
     	
     	//initializes position, texture, and rectangle (used for collision detection)
         this.position = position;
         this.player = player;
+        this.speed = 2.5f;
         texture = new Texture(Gdx.files.internal("enemy.png"));
         bound = new Rectangle(position.x,position.y,32,32);
 
@@ -27,22 +28,16 @@ public class enemy {
 	public void update() {
 		//updates rectangle
     	bound.set(position.x,position.y,32,32);
-
+    	
     	//simple algorithm to follow player
-    	//inevitably causes clumping of the enemies
-    	//which is why a pheonix is spanwed when more than 5 clump together
-    	if(position.x>player.getPosition().x){
-    		position.x-=1f;
-    	}
-    	if(position.x<player.getPosition().x){
-    		position.x+=1f;
-    	}
-    	if (position.y<player.getPosition().y){	
-    		position.y+=1f;
-    	}
-    	if (position.y>player.getPosition().y){
-    		position.y-=1f;
-    	}
+    	float delta_x = position.x-player.getPosition().x;
+    	float delta_y = position.y-player.getPosition().y;
+    	float distance = (float) Math.sqrt(delta_x*delta_x + delta_y*delta_y);
+    	
+    	position.x-=delta_x/(distance/speed);
+    	position.y-=delta_y/(distance/speed);
+    	
+
     }
     	
 

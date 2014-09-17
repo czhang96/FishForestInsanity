@@ -100,15 +100,22 @@ public class FishForestInsanity implements ApplicationListener {
 				}	
 			}
 			//add next wave of enemies 
-			if (stateTime % 4 >3.8){
-				int x= (int)(Math.random()*Gdx.graphics.getWidth());
-				int y= (int)(Math.random()*Gdx.graphics.getHeight());
-				if (Math.abs(x-player.getPosition().x)>300 && Math.abs(y-player.getPosition().y)>300){
-					es.add(new enemy (new Vector2(x,y),player));
+			if (stateTime % 2 >1.9){
+				boolean valid = false;
+				int x= (int)player.getPosition().x;
+				int y= (int)player.getPosition().y;
+				while (!valid){
+					x= (int)(Math.random()*Gdx.graphics.getWidth());
+					y= (int)(Math.random()*Gdx.graphics.getHeight());
+					if (Math.abs(x-player.getPosition().x)>500 && Math.abs(y-player.getPosition().y)>400){
+						valid = true;
+					}
 				}
-				else{
-					es.add(new enemy(new Vector2(x+300,y+300),player));
-				}
+				es.add(new enemy (new Vector2(x,y),player));
+				
+				
+
+
 			}
 			//adds wave of projectiles to be shot by pheonix
 			if (stateTime%2 > 1.8){
@@ -202,7 +209,7 @@ public class FishForestInsanity implements ApplicationListener {
 			text.begin();
 			System.out.println("123");
 			font.draw(text,"You lose.",300,300);
-			font.draw(text,"Score: "+String.valueOf(stateTime),300,600);
+			font.draw(text,"Score: "+String.valueOf((int)stateTime),300,600);
 			text.end();
 			
 			// resumes game by calling restart
@@ -226,7 +233,11 @@ public class FishForestInsanity implements ApplicationListener {
 		p = new ArrayList <projectile>();
 		bombs = new ArrayList <bomb>();
 		for (int i = 0 ; i <10 ; i++){
-			es.add(new enemy (new Vector2((int)(Math.random()*1000),(int)(Math.random()*700)),player));
+			int x= (int)(Math.random()*Gdx.graphics.getWidth());
+			int y= (int)(Math.random()*Gdx.graphics.getHeight());
+			if (Math.abs(x-player.getPosition().x)>500 && Math.abs(y-player.getPosition().y)>400){
+				es.add(new enemy (new Vector2(x,y),player));
+			}
 		}
 		bombRender= 0f;
 	}
