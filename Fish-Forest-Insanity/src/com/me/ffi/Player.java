@@ -14,7 +14,7 @@ public class Player  {
     Vector2 position;
     Texture texture;
     Rectangle bound;
-    
+ 
     public Player(Vector2 position) {
         this.position = position;
         this.texture =  new Texture(Gdx.files.internal("fish.jpg"));
@@ -26,8 +26,8 @@ public class Player  {
     public void update() {
 
     	//updates rectangle 
-    	bound.set(position.x, position.y,36 , 32);
-    	
+    	bound.set(position.x+10, position.y,40 , 60);
+
     	//moving based on accelerometer values
     	if(Gdx.input.getAccelerometerY()<0){
     		if (position.x>0){
@@ -51,7 +51,6 @@ public class Player  {
     	}
     	
     }
-    	
 
     public Rectangle getBound() {
 		return bound;

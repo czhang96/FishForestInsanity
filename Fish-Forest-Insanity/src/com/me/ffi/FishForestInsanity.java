@@ -6,10 +6,14 @@ import java.util.ArrayList;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
 public class FishForestInsanity implements ApplicationListener {
 	
@@ -27,6 +31,9 @@ public class FishForestInsanity implements ApplicationListener {
 	float bombRender;
 	Integer screen;
 	BitmapFont font;
+	ShapeRenderer sr;
+	
+	private Preferences prefs;
 	
 	public void create() {
 		restart();
@@ -34,10 +41,18 @@ public class FishForestInsanity implements ApplicationListener {
 		screen = 0;
 		font = new BitmapFont();
 		font.scale(3);
+		sr = new ShapeRenderer();
+		prefs = Gdx.app.getPreferences("Player");
+		prefs.flush();
+		if (!prefs.contains("highScore")){
+			prefs.putInteger("highScore", 0);
+		}
 	}
 
 	public void render() {
 		if (screen== 0){
+			
+			
 			
 			//getDeltaTime returns change in time from previous frame
 			//stateTime and bombRender are used to keep track of time
@@ -125,7 +140,7 @@ public class FishForestInsanity implements ApplicationListener {
 			}
 			// every five seconds, bomb is rendered, and the timer is reset
 			if (bombRender>5){
-				bombs.add(new bomb(new Vector2((int)(Math.random()*Gdx.graphics.getWidth()),(int)(Math.random()*Gdx.graphics.getHeight())),player));
+				bombs.add(new bomb(new Vector2((int)(Math.random()*(Gdx.graphics.getWidth()-250)),(int)(Math.random()*(Gdx.graphics.getHeight()-250))),player));
 				bombRender=0;
 			}
 			ArrayList <Integer> removeBomb = new ArrayList<Integer>();
@@ -205,24 +220,42 @@ public class FishForestInsanity implements ApplicationListener {
 			//clears screen
 			Gdx.gl.glClearColor(1, 1, 1, 1);
 			Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+			
 			//display losing text, and score (stateTime)
 			text.begin();
-			System.out.println("123");
 			font.draw(text,"You lose.",300,300);
-			font.draw(text,"Score: "+String.valueOf((int)stateTime),300,600);
+			
+			int score = (int)stateTime;
+			
+			if (score>getHighScore()){
+				System.out.println("cool");
+				font.draw(text,"New High Score!!: "+String.valueOf(score),300,900);
+				font.draw(text,"High Score: "+String.valueOf(score),300,600);
+				
+			}
+			else{
+				font.draw(text,"Score: "+String.valueOf(score),300,900);
+				font.draw(text,"High Score: "+String.valueOf(getHighScore()),300,600);
+			}
+			
 			text.end();
 			
 			// resumes game by calling restart
 			// and changing stateTime back to 0 and screen to 0
 			if (Gdx.input.isTouched()){
+				if (score>getHighScore()){
+					setHighScore(score);
+				}
 				restart();
-				screen=0;
-				stateTime=0f;
+				create();
+				
 			}	
 		}
 	}
 	//empties all arrays storing player, enemies, etc
 	public void restart() {
+		screen=0;
+		stateTime=0f;
 		batch = new SpriteBatch();
 		player = new Player(new Vector2(500,450));
 
@@ -241,22 +274,31 @@ public class FishForestInsanity implements ApplicationListener {
 		}
 		bombRender= 0f;
 	}
-
+	public void setHighScore(int val){
+		prefs.putInteger("highScore", val);
+		prefs.flush();
+	}
+	public int getHighScore(){
+		return prefs.getInteger("highScore");
+	}
+	
 	@Override
 	public void pause() {
+		prefs.flush();
 	}
 
 	@Override
 	public void resume() {
+		prefs.flush();
 	}
 	@Override
 	public void dispose() {
-
+		prefs.flush();	
 	}
 
 	@Override
 	public void resize(int width, int height) {
-		
+		prefs.flush();
 	}
 	public void draw(SpriteBatch batch){
 		//draws all of the enemies, projectiles and player with their 
@@ -275,6 +317,11 @@ public class FishForestInsanity implements ApplicationListener {
 		for (bomb b: bombs){
 			batch.draw(b.getTexture(),b.getPosition().x,b.getPosition().y);
 		}
+
 		batch.end();
+		sr.begin(ShapeType.Line);
+		sr.setColor(Color.BLUE);
+		sr.rect(player.getPosition().x+10, player.getPosition().y,40 , 60);
+		sr.end();
 	}
 }
